@@ -11,7 +11,6 @@ gem 'activesupport', '~> 3.2.0'
 
 group :test do
   gem 'rspec', '~> 2.8'
-  gem 'rack-test'
   gem 'simplecov', :require => false
   gem 'webmock'
   gem 'rack-test'
