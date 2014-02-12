@@ -5,13 +5,13 @@ ENV['RACK_ENV'] ||= "development"
 environment = ENV['RACK_ENV']
 
 unless defined?(LOGGER)
-  LOGGER = SyslogLogger('regis')
+  LOGGER = Logger.new($stdout)
   LOGGER.level = Logger::INFO
 end
 
 %w(
-  lib/regis
-  app/regis
+  lib
+  api
 ).each do |path|
   Dir.glob(File.expand_path("../../#{path}/**/*.rb", __FILE__)).each do |f|
     require f

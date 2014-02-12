@@ -2,12 +2,12 @@
 
 module Regis
 
-  class Base < Sinatra::Base
+  class V1 < Sinatra::Base
 
-    configure do |config|
-      config.set :logging, true
-      config.set :show_exceptions, false
-      config.set :root, File.expand_path('..', __FILE__)
+    configure do
+      enable :logging
+      set :show_exceptions, false
+      set :root, File.expand_path('..', __FILE__)
     end
 
     use Rack::ConditionalGet
