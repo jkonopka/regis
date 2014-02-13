@@ -9,10 +9,13 @@ unless defined?(LOGGER)
   LOGGER.level = Logger::INFO
 end
 
-$LOAD_PATH.unshift(File.expand_path('../../api', __FILE__))
-$LOAD_PATH.unshift(File.expand_path('../../lib', __FILE__))
 require 'sinatra'
 require 'sinatra/reloader'
+require 'yaml'
+require 'active_record'
+
+$LOAD_PATH.unshift(File.expand_path('../../api', __FILE__))
+$LOAD_PATH.unshift(File.expand_path('../../lib', __FILE__))
 
 #require 'application'
 require 'v1'
@@ -38,4 +41,9 @@ Rabl.configure do |config|
   config.include_json_root = false
 end
 
-#Regis::Configuration.instance.load!
+database_config = YAML.load(
+  ERB.new(
+    File.read(
+      File.expand_path("../database.yml", __FILE__))).result)
+ActiveRecord::Base.establish_connection(database_config[environment])
+

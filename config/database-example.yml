@@ -1,0 +1,16 @@
+---
+development:
+  database: regis_development
+  adapter: postgresql
+  encoding: unicode
+  host: localhost
+  username: regis
+  password: regis
+
+test:
+  database: regis_test
+  adapter: postgresql
+  encoding: unicode
+  host: localhost
+  username: regis
+  password: regis

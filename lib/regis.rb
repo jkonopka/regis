@@ -17,8 +17,12 @@ module Regis
   # Search for information about an address or a set of coordinates.
   #
   def search(query, options = {})
+    ##Regis::GeocodeLogEntries.count(:all, :conditions => ["created_at >= ?", Time.now.utc.beginning_of_day])
     query = Regis::Query.new(query, options) unless query.is_a?(Regis::Query)
-    query.blank? ? [] : query.execute
+    result = (query.blank? ? [] : query.execute)
+    if(!result.empty?)
+      Regis::GeocodeLogEntries.create(:query => query, :result => result, :provider => Regis::Configuration.provider.to_s)
+    end
   end
 
   ##
@@ -36,13 +40,8 @@ module Regis
   #
   def address(query, options = {})
     if (results = search(query, options)).size > 0
+      GeocodeLogEntries.
       results.first.address
     end
   end
 end
-
-# load Railtie if Rails exists
-# if defined?(Rails)
-#   require "regis/railtie"
-#   Regis::Railtie.insert
-# end

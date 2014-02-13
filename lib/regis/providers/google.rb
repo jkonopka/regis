@@ -17,42 +17,38 @@ module Regis::Provider
       2500
     end
 
-    def geocode(request)
-      params = {
-        'address' => request.address,
-        'sensor' => 'false'
-      }
+    # def geocode(request)
+    #   params = {
+    #     'address' => request.address,
+    #     'sensor' => 'false'
+    #   }
 
-      components = []
-      if (country = request.constraints[:country])
-        components.push("country:#{country}")
-      end
-      if (country = request.constraints[:state])
-        components.push("administrative_area:#{state}")
-      end
-      if components.any?
-        params['components'] = components.join('|')
-      end
+    #   components = []
+    #   if (country = request.constraints[:country])
+    #     components.push("country:#{country}")
+    #   end
+    #   if (country = request.constraints[:state])
+    #     components.push("administrative_area:#{state}")
+    #   end
+    #   if components.any?
+    #     params['components'] = components.join('|')
+    #   end
 
-      case request.location_hint
-        when Point
-          # TODO
-        when Bounds
-          query_params['bounds'] = request.location_hint.northwest.map { |p|
-            [p.latitude, p.longitude].join(',')
-          }.join('|')
-      end
+    #   case request.location_hint
+    #     when Point
+    #       # TODO
+    #     when Bounds
+    #       query_params['bounds'] = request.location_hint.northwest.map { |p|
+    #         [p.latitude, p.longitude].join(',')
+    #       }.join('|')
+    #   end
 
-      result = HTTP.get_json("http://maps.googleapis.com/maps/api/geocode/json",
-        params: params)
-      return normalize(result)
-    end
+    #   result = HTTP.get_json("http://maps.googleapis.com/maps/api/geocode/json",
+    #     params: params)
+    #   return normalize(result)
+    # end
 
     private
-
-      def normalize(result)
-        # TODO
-      end
 
     def valid_response?(response)
       status = parse_json(response.body)["status"]
@@ -60,8 +56,15 @@ module Regis::Provider
     end
 
     def results(query)
+      if(Regis::GeocodeLogEntries.count(:all, :conditions => ["created_at >= ?", Time.now.utc.beginning_of_day]) >= rate_limit_per_day)
+        raise_error(Regis::OverQueryLimitError) ||
+          warn("Google Geocoding API error: over query limit.")
+        return []
+      end
       return [] unless doc = fetch_data(query)
       case doc['status']; when "OK" # OK status implies >0 results
+        # increment query count here
+        # 
         return doc['results']
       when "OVER_QUERY_LIMIT"
         raise_error(Regis::OverQueryLimitError) ||

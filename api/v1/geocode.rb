@@ -7,10 +7,11 @@ module Regis
     post '/geocode' do
       search_address = params[:address]
       @data = Regis.search(search_address)
-      #rabl :geocode_data
       @data.to_json
     end
 
   end
+
+
 
 end
