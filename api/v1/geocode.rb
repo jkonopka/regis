@@ -5,7 +5,10 @@ module Regis
   class V1 < Sinatra::Base
 
     post '/geocode' do
-      # TODO
+      search_address = params[:address]
+      @data = Regis.search(search_address)
+      #rabl :geocode_data
+      @data.to_json
     end
 
   end

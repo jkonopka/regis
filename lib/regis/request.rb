@@ -23,5 +23,5 @@ module Regis
 end
 
 if defined?(Rack) and defined?(Rack::Request)
-  Rack::Request.send :include, Geocoder::Request
+  Rack::Request.send :include, Regis::Request
 end

@@ -9,6 +9,14 @@ unless defined?(LOGGER)
   LOGGER.level = Logger::INFO
 end
 
+$LOAD_PATH.unshift(File.expand_path('../../api', __FILE__))
+$LOAD_PATH.unshift(File.expand_path('../../lib', __FILE__))
+require 'sinatra'
+require 'sinatra/reloader'
+
+#require 'application'
+require 'v1'
+
 %w(
   lib
   api
@@ -18,4 +26,16 @@ end
   end
 end
 
-Regis::Configuration.instance.load!
+# Dir.glob(File.expand_path('../../lib/**/*.rb', __FILE__)).each do |file_name|
+#   require file_name
+# end
+
+# Dir.glob(File.expand_path('../../lib/*.rb', __FILE__)).each do |file_name|
+#   require file_name
+# end
+
+Rabl.configure do |config|
+  config.include_json_root = false
+end
+
+#Regis::Configuration.instance.load!

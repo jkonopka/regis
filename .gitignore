@@ -9,3 +9,4 @@ config/realms/*
 /_trash
 /.brow
 .rspec
+config/site.rb
