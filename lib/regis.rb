@@ -21,8 +21,9 @@ module Regis
     query = Regis::Query.new(query, options) unless query.is_a?(Regis::Query)
     result = (query.blank? ? [] : query.execute)
     if(!result.empty?)
-      Regis::GeocodeLogEntries.create(:query => query, :result => result, :provider => Regis::Configuration.provider.to_s)
+      Regis::GeocodeLogEntries.create!(:query => query, :result => result, :provider => Regis::Configuration.provider.to_s)
     end
+    result
   end
 
   ##
