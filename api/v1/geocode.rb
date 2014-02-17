@@ -7,6 +7,9 @@ module Regis
     post '/geocode' do
       search_address = params[:address]
       @data = Regis.search(search_address)
+      if(@data.rate_limited)
+        response.status = 503
+      end
       @data.to_json
     end
 
