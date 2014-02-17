@@ -6,7 +6,7 @@ module Regis::Result
 
     # true if result came from cache, false if from request to geocoding
     # service; nil if cache is not configured
-    attr_accessor :cache_hit
+    attr_accessor :cache_hit, :rate_limited
 
     ##
     # Takes a hash of data from a parsed geocoding service response.
@@ -14,6 +14,7 @@ module Regis::Result
     def initialize(data)
       @data = data
       @cache_hit = nil
+      @rate_limited = false
     end
 
     ##

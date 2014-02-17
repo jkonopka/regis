@@ -1,6 +1,8 @@
 
+- needs rate_limit status in response :: DONE? 2/17/14 JK, needs validation
 - needs query cache
 - needs result normalization check
 - needs API tests
 - needs README
+- needs around filter log (rack middleware) setup
 

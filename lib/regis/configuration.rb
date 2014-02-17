@@ -69,7 +69,7 @@ def set_defaults
 
       # geocoding options
       @data[:timeout]      = 3           # geocoding service timeout (secs)
-      @data[:provider]       = :google     # name of street address geocoding service (symbol)
+      @data[:provider]       = :test     # name of street address geocoding service (symbol)
       @data[:ip_provider]    = :freegeoip  # name of IP address geocoding service (symbol)
       @data[:language]     = :en         # ISO-639 language code
       @data[:http_headers] = {}          # HTTP headers for lookup
