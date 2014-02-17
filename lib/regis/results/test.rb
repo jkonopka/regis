@@ -18,11 +18,11 @@ module Regis::Result
     end
 
     def initialize(data)
-      if(!data.nil?)
-        data.keys.each do |attr|
-          Test.add_result_attribute(attr)
-        end
-      end
+      # if(!data.nil?)
+      #   data.keys.each do |attr|
+      #     Test.add_result_attribute(attr)
+      #   end
+      # end
       super
     end
   end
