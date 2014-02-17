@@ -39,7 +39,7 @@ module Regis::Provider
     def rate_limited
       if(Regis::GeocodeLogEntries.count(:all, :conditions => ["created_at >= ? and provider = ?", Time.now.utc.beginning_of_day, Regis::Configuration.provider.to_s]) >= rate_limit_per_day)
         raise_error(Regis::OverQueryLimitError) ||
-          warn("Google Geocoding API error: over query limit.")
+          warn("Test Geocoding API error: over query limit.")
         @rate_limited = true
       else
         @rate_limited = false

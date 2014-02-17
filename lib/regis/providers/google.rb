@@ -17,6 +17,17 @@ module Regis::Provider
       2500
     end
 
+    def rate_limited
+      if(Regis::GeocodeLogEntries.count(:all, :conditions => ["created_at >= ? and provider = ?", Time.now.utc.beginning_of_day, Regis::Configuration.provider.to_s]) >= rate_limit_per_day)
+        raise_error(Regis::OverQueryLimitError) ||
+          warn("Google Geocoding API error: over query limit.")
+        @rate_limited = true
+      else
+        @rate_limited = false
+      end
+      @rate_limited
+
+    end
     private
 
     def valid_response?(response)
@@ -26,11 +37,11 @@ module Regis::Provider
 
     def results(query)
       #if(Regis::GeocodeLogEntries.count(:all, :conditions => ["created_at >= ?", Time.now.utc.beginning_of_day]) >= rate_limit_per_day)
-      if(Regis::GeocodeLogEntries.count(:all, :conditions => ["created_at >= ? and provider = ?", Time.now.utc.beginning_of_day, Regis::Configuration.provider.to_s]) >= rate_limit_per_day)
-        raise_error(Regis::OverQueryLimitError) ||
-          warn("Google Geocoding API error: over query limit.")
-        return []
-      end
+#      if(Regis::GeocodeLogEntries.count(:all, :conditions => ["created_at >= ? and provider = ?", Time.now.utc.beginning_of_day, Regis::Configuration.provider.to_s]) >= rate_limit_per_day)
+#        raise_error(Regis::OverQueryLimitError) ||
+#          warn("Google Geocoding API error: over query limit.")
+#        return []
+#      end
       return [] unless doc = fetch_data(query)
       case doc['status']; when "OK" # OK status implies >0 results
         return doc['results']

@@ -39,23 +39,28 @@ module Regis
       # for reverse geocoding. Returns an array of <tt>Geocoder::Result</tt>s.
       #
       def search(query, options = {})
-        if(rate_limited)
-            result = result_class.new(nil)
-            result.rcache_hit = @cache_hit if cache
-            result.rate_limited = @rate_limited if rate_limited
+        query = Regis::Query.new(query, options) unless query.is_a?(Regis::Query)
+        result = result_class.new([])
 
+        if(rate_limited)
+          result.cache_hit = @cache_hit if cache
+          result.rate_limited = @rate_limited if rate_limited
         else
-          query = Regis::Query.new(query, options) unless query.is_a?(Regis::Query)
-          results(query).map{ |r|
-            result = result_class.new(r)
+          result_set = results(query)
+          case(result_set.count)
+          when 0
             result.cache_hit = @cache_hit if cache
             result.rate_limited = @rate_limited if rate_limited
-          }
-        if(!result.blank?)
+          else
+            result.cache_hit = @cache_hit if cache
+            result.rate_limited = @rate_limited if rate_limited
+            result_set.map{ |r|
+              result.data << r
+            }
+          end
           Regis::GeocodeLogEntries.create!(:query => query, :result => result, :provider => Regis::Configuration.provider.to_s)
         end
-
-        end
+        # end
         result
       end
 
@@ -95,7 +100,6 @@ module Regis
       end
 
       def rate_limited
-        @rate_limited = true
         @rate_limited
       end
 
