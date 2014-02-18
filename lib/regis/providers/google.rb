@@ -48,6 +48,7 @@ module Regis::Provider
       when "OVER_QUERY_LIMIT"
         raise_error(Regis::OverQueryLimitError) ||
           warn("Google Geocoding API error: over query limit.")
+          @rate_limited = true
       when "REQUEST_DENIED"
         raise_error(Regis::RequestDenied) ||
           warn("Google Geocoding API error: request denied.")
