@@ -16,7 +16,8 @@ module Regis
     def street_services
       [
         :google,
-        :test
+        :test,
+        :ovi
       ]
     end
 
