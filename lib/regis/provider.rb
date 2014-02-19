@@ -17,7 +17,8 @@ module Regis
       [
         :google,
         :test,
-        :ovi
+        :ovi,
+        :here
       ]
     end
 

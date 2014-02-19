@@ -38,7 +38,9 @@ module Regis
       :cache_prefix,
       :always_raise,
       :units,
-      :distances
+      :distances,
+      :app_id,
+      :app_code
     ]
 
     attr_accessor :data
@@ -79,6 +81,9 @@ def set_defaults
       @data[:api_key]      = nil         # API key for geocoding service
       @data[:cache]        = nil         # cache object (must respond to #[], #[]=, and #keys)
       @data[:cache_prefix] = "regis:" # prefix (string) to use for all cache keys
+      @data[:cache]        = nil         # cache object (must respond to #[], #[]=, and #keys)
+      @data[:app_id]        = "6BfYFgVfbRGLufNa3YyH"         # here app_id
+      @data[:app_code]      = "dT4mkeydz7V0oVQ01PDHQQ"         # here app_code
 
       # exceptions that should not be rescued by default
       # (if you want to implement custom error handling);
