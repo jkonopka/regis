@@ -13,7 +13,8 @@ module Regis::Provider
     end
 
     def query_url(query)
-      "#{protocol}://lbs.ovi.com/search/6.2/#{if query.reverse_geocode? then 'reverse' end}geocode.json?" + url_query_string(query)
+#      "#{protocol}://lbs.ovi.com/search/6.2/#{if query.reverse_geocode? then 'reverse' end}geocode.json?" + url_query_string(query)
+      "#{protocol}://where.desktop.mos.svc.ovi.com/json/#{if query.reverse_geocode? then 'reverse' end}geocode.json?" + url_query_string(query)
     end
 
     def rate_limit_per_day
