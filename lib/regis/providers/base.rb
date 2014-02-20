@@ -55,7 +55,7 @@ module Regis
             result.cache_hit = @cache_hit if cache
             result.rate_limited = @rate_limited if rate_limited
             result_set.map{ |r|
-              result.data << r
+              result.data << r.normalized_data
             }
           end
           Regis::GeocodeLogEntries.create!(:query => query, :result => result, :provider => Regis::Configuration.provider.to_s)

@@ -54,6 +54,34 @@ module Regis::Result
       address_data['addrCountryCode']
     end
 
+    def latitute
+      @data["results"][0]['properties']['geoLatitude'].to_f
+    end
+
+    def longitute
+      @data["results"][0]['properties']['geoLatitude'].to_f
+    end
+
+    def normalized_data
+      { "Location"=>{
+        "lat"=>latitute,
+        "lng"=>longitute
+        "location_type"=>"unknown"
+        "confidence" => 0.0
+        },
+        "Address" =>{
+        "Formatted_Address"=>"3 Paulmier Pl, Jersey City, NJ 07302, United States",
+        "Country"=>country_code,
+        "State"=>state_code
+        "County"=>province, 
+        "City"=>city, 
+        "Street"=>"Paulmier Pl", 
+        "HouseNumber"=>"3", 
+        "PostalCode"=>postal_code
+        }
+      }
+    end
+
     private # ----------------------------------------------------------------
 
     def address_data

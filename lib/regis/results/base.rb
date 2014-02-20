@@ -62,6 +62,10 @@ module Regis::Result
     def country_code
       fail
     end
+
+    def normalized_hash
+      fail
+    end
   end
 
 end
