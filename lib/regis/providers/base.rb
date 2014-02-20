@@ -189,7 +189,7 @@ module Regis
         raise_error(err) or warn "Geocoding API connection cannot be established."
       rescue TimeoutError => err
         raise_error(err) or warn "Geocoding API not responding fast enough " +
-          "(use Geocoder.configure(:timeout => ...) to set limit)."
+          "(use Regis.configure(:timeout => ...) to set limit)."
       end
 
       def parse_json(data)
