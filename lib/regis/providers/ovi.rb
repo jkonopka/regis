@@ -14,7 +14,9 @@ module Regis::Provider
 
     def query_url(query)
 #      "#{protocol}://lbs.ovi.com/search/6.2/#{if query.reverse_geocode? then 'reverse' end}geocode.json?" + url_query_string(query)
-      "#{protocol}://where.desktop.mos.svc.ovi.com/json/#{if query.reverse_geocode? then 'reverse' end}geocode.json?" + url_query_string(query)
+#      "#{protocol}://where.desktop.mos.svc.ovi.com/json?dv=OviMapsAPI&la=en-US&q=3+Paulmier+Place%2C+07302&to=20&vi=where&lat=0&lon=0"
+      puts "#{protocol}://where.desktop.mos.svc.ovi.com/json?" + url_query_string(query)
+      "#{protocol}://where.desktop.mos.svc.ovi.com/json?" + url_query_string(query)
     end
 
     def rate_limit_per_day
@@ -24,7 +26,7 @@ module Regis::Provider
     def rate_limited
       if(Regis::GeocodeLogEntries.count(:all, :conditions => ["created_at >= ? and provider = ?", Time.now.utc-24.hours, Regis::Configuration.provider.to_s]) >= rate_limit_per_day)
         raise_error(Regis::OverQueryLimitError) ||
-          warn("Google Geocoding API error: over query limit.")
+          warn("OVI Geocoding API error: over query limit.")
         @rate_limited = true
       else
         @rate_limited = false
@@ -37,19 +39,23 @@ module Regis::Provider
 
     def results(query)
       return [] unless doc = fetch_data(query)
-      return [] unless doc['Response'] && doc['Response']['View']
-      if r=doc['Response']['View']
-        return [] if r.nil? || !r.is_a?(Array) || r.empty?
-        return r.first['Result']
-      end
-      []
+      puts "doc ::: #{doc}"
+      return [] unless doc['results']
+      # if r=doc['Response']['View']
+      #   return [] if r.nil? || !r.is_a?(Array) || r.empty?
+      #   return r.first['Result']
+      # end
+      # []
+      return doc['results']
     end
 
     def query_url_params(query)
       options = {
-        :gen=>1,
-        :app_id=>api_key,
-        :app_code=>api_code
+        :dv=>"OviMapsAPI",
+        :la=>"en-US",
+        :vi=>"where",
+        :lat=>0,
+        :lon=>0,
       }
 
       if query.reverse_geocode?
@@ -59,21 +65,10 @@ module Regis::Provider
         )
       else
         super.merge(options).merge(
-          :searchtext=>query.sanitized_text
+          :q=>query.sanitized_text
         )
       end
     end
 
-    def api_key
-      if a=configuration.api_key
-        return a.first if a.is_a?(Array)
-      end
-    end
-
-    def api_code
-      if a=configuration.api_key
-        return a.last if a.is_a?(Array)
-      end
-    end
   end
 end

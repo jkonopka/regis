@@ -7,56 +7,57 @@ module Regis::Result
     # A string in the given format.
     #
     def address(format = :full)
-      address_data['Label']
+      address_data['title']
     end
 
     ##
     # A two-element array: [lat, lon].
     #
     def coordinates
-      fail unless d = @data['Location']['DisplayPosition']
-      [d['Latitude'].to_f, d['Longitude'].to_f]
+      fail unless d = @data["results"][0]['properties']
+      [d['geoLatitude'].to_f, d['geoLongitude'].to_f]
     end
 
     def state
-      address_data['County']
+      address_data['addrStateCode']
     end
 
     def province
-      address_data['County']
+      address_data['addrCountyName']
     end
 
     def postal_code
-      address_data['PostalCode']
+      address_data['addrPostalCode']
     end
 
     def city
-      address_data['City']
+      address_data['addrCityName']
     end
 
     def state_code
-      address_data['State']
+      address_data['addrStateCode']
     end
 
     def province_code
-      address_data['State']
+      address_data['addrStateCode']
     end
 
     def country
-      fail unless d = address_data['AdditionalData']
-      if v = d.find{|ad| ad['key']=='CountryName'}
-        return v['value']
-      end
+      address_data['addrCountryName']
+      #fail unless d = address_data['addrCountryName']
+      # if v = d.find{|ad| ad['key']=='CountryName'}
+      #   return v['value']
+      # end
     end
 
     def country_code
-      address_data['Country']
+      address_data['addrCountryCode']
     end
 
     private # ----------------------------------------------------------------
 
     def address_data
-      @data['Location']['Address'] || fail
+      @data["results"][0]['properties'] || fail
     end
   end
 end
