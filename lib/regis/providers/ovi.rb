@@ -1,5 +1,6 @@
 require 'regis/providers/base'
 require 'regis/results/ovi'
+require 'regis/result_helpers/ovi'
 
 module Regis::Provider
   class Ovi < Base

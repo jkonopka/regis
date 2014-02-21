@@ -1,5 +1,6 @@
 require 'regis/providers/base'
 require "regis/results/google"
+require 'regis/result_helpers/google'
 
 module Regis::Provider
 

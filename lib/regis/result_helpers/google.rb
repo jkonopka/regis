@@ -1,10 +1,9 @@
 module Regis::ResultHelper
-  class Google 
+  class Google
     attr_accessor :single_result
 
     def initialize(data)
       @single_result = data
-      puts @single_result.inspect
     end
 
     def coordinates

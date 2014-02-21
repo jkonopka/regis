@@ -1,5 +1,6 @@
 require 'regis/providers/base'
 require 'regis/results/here'
+require 'regis/result_helpers/here'
 
 module Regis::Provider
   class Here < Base
