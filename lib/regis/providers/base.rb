@@ -55,7 +55,7 @@ module Regis
             result.cache_hit = @cache_hit if cache
             result.rate_limited = @rate_limited if rate_limited
             result_set.map{ |r|
-              if(configuration.normalize)
+              if(configuration.normalize || options[:normalize])
                 result.data << result_helper_class.new(r).normalized_data
               else
                 result.data << r

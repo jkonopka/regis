@@ -1,7 +1,9 @@
 
-- needs rate_limit status in response :: DONE? 2/17/14 JK, needs validation
+- needs rate_limit status in response 
+    DONE? 2/17/14 JK, needs validation - seems to work...
 - needs query cache
 - needs result normalization check
+    complete for :google, :here, :ovi
 - needs API tests
 - needs README
 - needs around filter log (rack middleware) setup

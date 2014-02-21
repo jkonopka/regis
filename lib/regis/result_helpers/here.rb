@@ -114,8 +114,8 @@ module Regis::ResultHelper
 
     def normalized_data
       { "location"=>{
-          "lat"=>latitute,
-          "lng"=>longitute,
+          "lat"=>latitude,
+          "lng"=>longitude,
           "location_type"=>location_type_as_int,
           "confidence" => confidence
         },

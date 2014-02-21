@@ -108,11 +108,10 @@ module Regis::ResultHelper
       f << street_number if !street_number.nil?
       f << "#{street}," if !street.nil?
       f << "#{city}," if !city.nil?
-      f << "#{state}," if !state.nil?
       f << state if !state.nil?
       f << postal_code if !postal_code.nil?
       f << ", #{country}" if !country.nil?
-
+      f.join(" ")
     end
 
     def confidence

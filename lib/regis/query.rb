@@ -35,7 +35,7 @@ module Regis
       if ip_address?
         name = options[:ip_provider] || Configuration.ip_provider || Regis::Provider.ip_services.first
       else
-        name = options[:provider] || Configuration.provider || Regis::Provider.street_services.first
+        name = options[:provider].to_sym || Configuration.provider || Regis::Provider.street_services.first
       end
       Provider.get(name)
     end

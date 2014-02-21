@@ -6,11 +6,8 @@ module Regis
 
     post '/geocode' do
       search_address = params[:address]
-      # config = params[:config]
-      # if(config)
-      #   Regis.configure(config)
-      # end
-      @data = Regis.search(search_address)
+      config = params[:config] || {}
+      @data = Regis.search(search_address, config)
       if(@data.rate_limited)
         response.status = 503
       end
