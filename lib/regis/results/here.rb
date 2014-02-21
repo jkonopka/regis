@@ -53,6 +53,26 @@ module Regis::Result
       address_data['Country']
     end
 
+    def normalized_data
+      { "location"=>{
+          "lat"=>latitute,
+          "lng"=>longitute,
+          "location_type"=>precision,
+          "confidence" => confidence
+        },
+        "address" => {
+        "formatted_address"=> formatted_address,
+        "country"=>country_code,
+        "state"=>state_code,
+        "county"=>sub_state_code,
+        "city"=>city,
+        "street"=> street_address,
+        "house_number"=> street_number,
+        "postal_code"=>postal_code
+        }
+      }
+    end
+
     private # ----------------------------------------------------------------
 
     def address_data

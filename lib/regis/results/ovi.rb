@@ -63,25 +63,38 @@ module Regis::Result
     end
 
     def normalized_data
-      { "Location"=>{
+      { "location"=>{
         "lat"=>latitute,
-        "lng"=>longitute
-        "location_type"=>"unknown"
-        "confidence" => 0.0
+        "lng"=>longitute,
+        "location_type"=>location_type,
+        "confidence" => confidence
         },
-        "Address" =>{
-        "Formatted_Address"=>"3 Paulmier Pl, Jersey City, NJ 07302, United States",
-        "Country"=>country_code,
-        "State"=>state_code
-        "County"=>province, 
-        "City"=>city, 
-        "Street"=>"Paulmier Pl", 
-        "HouseNumber"=>"3", 
-        "PostalCode"=>postal_code
+        "address" => {
+        "formatted_address"=> formatted_address,
+        "country"=>country_code,
+        "state"=>state_code,
+        "county"=>province,
+        "city"=>city,
+        "street"=> street,
+        "house_number"=> house_number,
+        "postal_code"=>postal_code
         }
       }
     end
 
+    def location_type
+      "unknown"
+    end
+
+    def confidence
+      0.0
+    end
+
+    def formatted_address
+      "3 Paulmier Pl, Jersey City, NJ 07302, United States"
+    end
+
+    
     private # ----------------------------------------------------------------
 
     def address_data

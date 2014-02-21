@@ -43,6 +43,9 @@ module Regis::Provider
 #        return []
 #      end
       return [] unless doc = fetch_data(query)
+
+      puts "fetch_data: #{doc.inspect}"
+
       case doc['status']; when "OK" # OK status implies >0 results
         return doc['results']
       when "OVER_QUERY_LIMIT"
