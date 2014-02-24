@@ -1,5 +1,5 @@
 module Regis::ResultHelper
-  class Ovi 
+  class Ovi
 
     attr_accessor :single_result
 
@@ -96,10 +96,6 @@ module Regis::ResultHelper
 
     def location_type
       "unknown"
-    end
-
-    def confidence
-      0.0
     end
 
     def formatted_address

@@ -21,11 +21,12 @@ module Regis::Provider
     end
 
     def rate_limit_per_day
-      2500
+      50000
     end
 
+    # ha! this is wrong... configuration is not current
     def rate_limited
-      if(Regis::GeocodeLogEntries.count(:all, :conditions => ["created_at >= ? and provider = ?", Time.now.utc-24.hours, Regis::Configuration.provider.to_s]) >= rate_limit_per_day)
+      if(Regis::GeocodeLogEntries.count(:all, :conditions => ["created_at >= ? and provider = ?", Time.now.utc-24.hours, name.downcase]) >= rate_limit_per_day)
         raise_error(Regis::OverQueryLimitError) ||
           warn("OVI Geocoding API error: over query limit.")
         @rate_limited = true

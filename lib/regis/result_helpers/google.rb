@@ -140,7 +140,7 @@ module Regis::ResultHelper
     end
 
     def confidence
-      # mix of location type and closest address component
+      # closest address component
       case
         when(!street_number.nil?)
           1.0

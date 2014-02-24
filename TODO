@@ -1,5 +1,5 @@
 
-- needs rate_limit status in response 
+- needs rate_limit status in response
     DONE? 2/17/14 JK, needs validation - seems to work...
 - needs query cache
 - needs result normalization check
@@ -8,3 +8,4 @@
 - needs README
 - needs around filter log (rack middleware) setup
 
+- need to fix rate limit provider name (using default rather than current)
