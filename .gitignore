@@ -11,4 +11,3 @@ config/realms/*
 .rspec
 config/site.rb
 config/database.yml
-db/schema.rb

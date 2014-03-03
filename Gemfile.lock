@@ -1,41 +1,54 @@
 GIT
-  remote: https://github.com/bengler/bengler_test_helper.git
-  revision: c8a33fbb5a2b285741399c1683af35b5aa650455
+  remote: git://github.com/atombender/sinatra-activerecord.git
+  revision: d42db4f0eaf63fcf1af3318528530d0779995889
   specs:
-    bengler_test_helper (0.0.6)
+    sinatra-activerecord (1.3.0)
+      activerecord (>= 3.0)
+      sinatra (~> 1.0)
+
+GIT
+  remote: https://github.com/rack/rack-contrib.git
+  revision: 6ff3ca2b2d988911ca52a2712f6a7da5e064aa27
+  specs:
+    rack-contrib (1.2.0)
+      rack (>= 0.9.1)
 
 GEM
   remote: https://rubygems.org/
   specs:
-    activemodel (3.2.6)
-      activesupport (= 3.2.6)
-      builder (~> 3.0.0)
-    activerecord (3.2.6)
-      activemodel (= 3.2.6)
-      activesupport (= 3.2.6)
-      arel (~> 3.0.2)
-      tzinfo (~> 0.3.29)
-    activesupport (3.2.6)
-      i18n (~> 0.6)
-      multi_json (~> 1.0)
+    activemodel (4.0.3)
+      activesupport (= 4.0.3)
+      builder (~> 3.1.0)
+    activerecord (4.0.3)
+      activemodel (= 4.0.3)
+      activerecord-deprecated_finders (~> 1.0.2)
+      activesupport (= 4.0.3)
+      arel (~> 4.0.0)
+    activerecord-deprecated_finders (1.0.3)
+    activesupport (4.0.3)
+      i18n (~> 0.6, >= 0.6.4)
+      minitest (~> 4.2)
+      multi_json (~> 1.3)
+      thread_safe (~> 0.1)
+      tzinfo (~> 0.3.37)
     addressable (2.2.8)
-    arel (3.0.3)
+    arel (4.0.2)
+    atomic (1.1.15)
     backports (3.5.0)
-    builder (3.0.4)
+    builder (3.1.4)
     crack (0.3.1)
     diff-lcs (1.1.3)
     excon (0.12.0)
-    i18n (0.6.0)
+    i18n (0.6.9)
     json (1.8.1)
     kgio (2.7.4)
-    multi_json (1.3.6)
+    minitest (4.7.5)
+    multi_json (1.8.4)
     pg (0.17.1)
     rabl (0.7.0)
       activesupport (>= 2.3.14)
       multi_json (~> 1.0)
-    rack (1.4.1)
-    rack-contrib (1.1.0)
-      rack (>= 0.9.1)
+    rack (1.5.2)
     rack-protection (1.5.2)
       rack
     rack-test (0.6.1)
@@ -58,8 +71,6 @@ GEM
       rack (~> 1.4)
       rack-protection (~> 1.4)
       tilt (~> 1.3, >= 1.3.4)
-    sinatra-activerecord (0.1.3)
-      sinatra (>= 0.9.4)
     sinatra-contrib (1.4.2)
       backports (>= 2.0)
       multi_json
@@ -69,6 +80,8 @@ GEM
       tilt (~> 1.3)
     sinatra-reloader (1.0)
       sinatra-contrib
+    thread_safe (0.2.0)
+      atomic (>= 1.1.7, < 2)
     tilt (1.4.1)
     tzinfo (0.3.38)
     unicorn (4.3.1)
@@ -83,21 +96,19 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  activerecord
-  activesupport (~> 3.2.0)
-  bengler_test_helper!
+  activerecord (~> 4.0)
   excon (~> 0.12.0)
   json (~> 1.8)
   pg
   rabl (~> 0.7.0)
-  rack (~> 1.4)
-  rack-contrib (~> 1.1.0)
+  rack (~> 1.5)
+  rack-contrib!
   rack-test
   rake
   rspec (~> 2.8)
   simplecov
   sinatra (~> 1.4)
-  sinatra-activerecord
+  sinatra-activerecord!
   sinatra-reloader
   unicorn (~> 4.3.1)
   webmock

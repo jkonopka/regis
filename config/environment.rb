@@ -1,13 +1,7 @@
+load(File.expand_path('../site.rb', __FILE__)) if File.exist?(File.expand_path('../site.rb', __FILE__))
+
 require "bundler"
 Bundler.require
-
-ENV['RACK_ENV'] ||= "development"
-environment = ENV['RACK_ENV']
-
-unless defined?(LOGGER)
-  LOGGER = Logger.new($stdout)
-  LOGGER.level = Logger::INFO
-end
 
 require 'sinatra'
 require 'sinatra/reloader'
@@ -37,13 +31,21 @@ end
 #   require file_name
 # end
 
+ENV['RACK_ENV'] ||= "development"
+environment = ENV['RACK_ENV']
+
+unless defined?(LOGGER)
+  LOGGER = Logger.new($stdout)
+  LOGGER.level = Logger::INFO
+end
+
 Rabl.configure do |config|
   config.include_json_root = false
 end
 
-database_config = YAML.load(
-  ERB.new(
-    File.read(
-      File.expand_path("../database.yml", __FILE__))).result)
-ActiveRecord::Base.establish_connection(database_config[environment])
+ActiveRecord::Base.logger ||= LOGGER
 
+ActiveRecord::Base.configurations = YAML.load(
+  ERB.new(File.read(File.expand_path("../database.yml", __FILE__))).result).with_indifferent_access
+
+ActiveRecord::Base.establish_connection(ActiveRecord::Base.configurations[environment])
