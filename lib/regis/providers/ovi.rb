@@ -16,7 +16,6 @@ module Regis::Provider
     def query_url(query)
 #      "#{protocol}://lbs.ovi.com/search/6.2/#{if query.reverse_geocode? then 'reverse' end}geocode.json?" + url_query_string(query)
 #      "#{protocol}://where.desktop.mos.svc.ovi.com/json?dv=OviMapsAPI&la=en-US&q=3+Paulmier+Place%2C+07302&to=20&vi=where&lat=0&lon=0"
-      puts "#{protocol}://where.desktop.mos.svc.ovi.com/json?" + url_query_string(query)
       "#{protocol}://where.desktop.mos.svc.ovi.com/json?" + url_query_string(query)
     end
 
@@ -41,7 +40,6 @@ module Regis::Provider
 
     def results(query)
       return [] unless doc = fetch_data(query)
-      puts "doc ::: #{doc}"
       return [] unless doc['results']
       # if r=doc['Response']['View']
       #   return [] if r.nil? || !r.is_a?(Array) || r.empty?
