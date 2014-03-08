@@ -63,7 +63,7 @@ module Regis::Result
       fail
     end
 
-    def normalized_hash
+    def normalized_data
       fail
     end
   end

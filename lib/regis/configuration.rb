@@ -85,7 +85,7 @@ def set_defaults
       @data[:cache]        = nil         # cache object (must respond to #[], #[]=, and #keys)
       @data[:app_id]        = "6BfYFgVfbRGLufNa3YyH"         # here app_id
       @data[:app_code]      = "dT4mkeydz7V0oVQ01PDHQQ"         # here app_code
-      @data[:normalize]     = false
+      @data[:normalize]     = true
       # exceptions that should not be rescued by default
       # (if you want to implement custom error handling);
       # supports SocketError and TimeoutError

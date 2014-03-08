@@ -8,6 +8,7 @@ module Regis
       search_address = params[:address]
       config = params[:config] || {}
       @data = Regis.search(search_address, config)
+      # TODO when regis.search fails hard, @data comes back as an empty array... must fix that
       if(@data.rate_limited)
         response.status = 503
       end

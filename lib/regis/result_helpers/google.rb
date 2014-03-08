@@ -50,6 +50,13 @@ module Regis::ResultHelper
       end
     end
 
+    def county
+      if state = address_components_of_type(:administrative_area_level_2).first
+        state['long_name']
+      end
+    end
+
+
     def sub_state_code
       if state = address_components_of_type(:administrative_area_level_2).first
         state['short_name']
@@ -120,6 +127,11 @@ module Regis::ResultHelper
       @single_result['geometry']
     end
 
+    #%w(street_address route intersection political country administrative_area_level_1 administrative_area_level_2 administrative_area_level_3 colloquial_area locality sublocality neighborhood premise subpremise postal_code natural_feature airport park point_of_interest)
+    def result_type
+      types[0] if types
+    end
+
     def location_type
       geometry['location_type'] if geometry
     end
@@ -142,19 +154,19 @@ module Regis::ResultHelper
     def confidence
       # closest address component
       case
-        when(!street_number.nil?)
-          1.0
-        when(!route.nil?)
-          0.7
-        when(!city.nil?)
-          0.4
-        when(!sub_state.nil?)
-          0.2
-        when(!state.nil?)
-          0.1
-        else
-          0.0
-        end
+      when(!street_number.nil?)
+        1.0
+      when(!route.nil?)
+        0.7
+      when(!city.nil?)
+        0.4
+      when(!sub_state.nil?)
+        0.2
+      when(!state.nil?)
+        0.1
+      else
+        0.0
+      end
     end
 
     def latitude
@@ -165,22 +177,33 @@ module Regis::ResultHelper
       geometry["location"]["lng"] if geometry
     end
 
+    def accuracy
+      good_enough_types = %w(street_address postal_code subpremise premise intersection)
+      return true if good_enough_types.include?(result_type)
+      area = (geometry["bounds"]["southwest"]["lng"] - geometry["bounds"]["northeast"]["lng"]) * (geometry["bounds"]["southwest"]["lat"] - geometry["bounds"]["northeast"]["lat"])
+      return true if (area < 0.00004)
+      return false
+    end
+
     def normalized_data
-      { "location"=>{
+      {
+        "location"=>{
           "lat"=>latitude,
           "lng"=>longitude,
-          "location_type"=>location_type_as_int,
+          "location_type" => location_type.downcase,
+          "result_type"=>result_type,
+          "accuracy"=> accuracy,
           "confidence" => confidence
         },
         "address" => {
-        "formatted_address"=> formatted_address,
-        "country"=>country_code,
-        "state"=>state_code,
-        "county"=>sub_state_code,
-        "city"=>city,
-        "street"=> street_address,
-        "house_number"=> street_number,
-        "postal_code"=>postal_code
+          "formatted_address"=> formatted_address,
+          "country"=>country_code,
+          "state"=>state_code,
+          "county"=>sub_state_code,
+          "city"=>city,
+          "street"=> street_address,
+          "house_number"=> street_number,
+          "postal_code"=>postal_code
         }
       }
     end
