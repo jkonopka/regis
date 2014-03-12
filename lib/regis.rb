@@ -38,7 +38,7 @@ module Regis
   #
   def address(query, options = {})
     if (results = search(query, options)).size > 0
-      #Regis::GeocodeLogEntries.
+      #Regis::GeocodeLogEntry.
       results.first.address
     end
   end
