@@ -180,8 +180,14 @@ module Regis::ResultHelper
     def accuracy
       good_enough_types = %w(street_address postal_code subpremise premise intersection)
       return true if good_enough_types.include?(result_type)
-      area = (geometry["bounds"]["southwest"]["lng"] - geometry["bounds"]["northeast"]["lng"]) * (geometry["bounds"]["southwest"]["lat"] - geometry["bounds"]["northeast"]["lat"])
-      return true if (area < 0.00004)
+      if (bounds = geometry['bounds'])
+        if bounds['northeast'] and bounds['southwest']
+          area =
+            (bounds["southwest"]["lng"] - bounds["northeast"]["lng"]) *
+            (bounds["southwest"]["lat"] - bounds["northeast"]["lat"])
+          return true if area < 0.00004
+        end
+      end
       return false
     end
 
