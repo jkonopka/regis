@@ -62,7 +62,10 @@ module Regis
               end
             }
           end
-          Regis::GeocodeLogEntry.create!(:query => query.to_s, :result => result.to_s, :provider => Regis::Configuration.provider.to_s)
+          Regis::GeocodeLogEntry.create!(
+            query: query,
+            result: result,
+            provider: Regis::Configuration.provider.to_s)
         end
         # end
         result
