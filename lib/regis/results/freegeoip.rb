@@ -1,7 +1,40 @@
-require 'regis/results/base'
+require_relative '../providers/freegeoip'
 
-module Regis::Result
-  class Freegeoip < Base
+class Regis::Provider::Freegeoip
+
+  class Results
+
+    attr_reader :results
+    attr_reader :raw_results
+
+    def initialize(raw_results)
+      @raw_results = raw_results
+      @results = [Result.new(@raw_results)]
+    end
+
+    def as_json(*args)
+      @results.map { |r| r.as_json(*args) }
+    end
+
+    def eql?(other)
+      return other.is_a?(Results) &&
+        @results == other.results
+    end
+    alias_method :==, :eql?
+
+  end
+
+  class Result
+
+    attr_reader :raw_result
+
+    def initialize(raw_result)
+      @raw_result = raw_result
+    end
+
+    def as_json(*args)
+      {}  # TODO
+    end
 
     def address(format = :full)
       s = state_code.to_s == "" ? "" : ", #{state_code}"
@@ -9,27 +42,27 @@ module Regis::Result
     end
 
     def city
-      @data['city']
+      @raw_result['city']
     end
 
     def state
-      @data['region_name']
+      @raw_result['region_name']
     end
 
     def state_code
-      @data['region_code']
+      @raw_result['region_code']
     end
 
     def country
-      @data['country_name']
+      @raw_result['country_name']
     end
 
     def country_code
-      @data['country_code']
+      @raw_result['country_code']
     end
 
     def postal_code
-      @data['zipcode']
+      @raw_result['zipcode']
     end
 
     def self.response_attributes
@@ -38,8 +71,9 @@ module Regis::Result
 
     response_attributes.each do |a|
       define_method a do
-        @data[a]
+        @raw_result[a]
       end
     end
   end
+
 end

@@ -1,42 +1,39 @@
-require 'regis/providers/base'
-require 'regis/results/here'
-require 'regis/result_helpers/here'
-
 module Regis::Provider
+
   class Here < Base
 
-    def name
-      "Here"
-    end
-
-    def required_api_key_parts
-      []
-    end
-
     def query_url(query)
-      "#{protocol}://#{if query.reverse_geocode? then 'reverse.' end}geocoder.api.here.com/6.2/#{if query.reverse_geocode? then 'reverse' end}geocode.json?" + url_query_string(query)
+      "#{protocol}://#{if query.coordinates? then 'reverse.' end}" \
+        "geocoder.api.here.com/6.2/" \
+        "#{if query.coordinates? then 'reverse' end}" \
+        "geocode.json?" + url_query_string(query)
     end
 
-    private # ---------------------------------------------------------------
-
-    def results(query)
-      return [] unless doc = fetch_data(query)
-      return [] unless doc['Response'] && doc['Response']['View']
-      if r=doc['Response']['View']
-        return [] if r.nil? || !r.is_a?(Array) || r.empty?
-        return r.first['Result']
-      end
-      []
+    def search(query)
+      raw_results = ::Regis::CachedResult.with_cache(self, query) {
+        doc = fetch_data(query)
+        unless doc['Response'] && doc['Response']['View']
+          raise InvalidResponseError, "Expected response to contain 'Response' and 'View'"
+        end
+        view = doc['Response']['View']
+        if view.nil? || !view.is_a?(Array) || view.empty?
+          raise InvalidResponseError, "Invalid result data in response"
+        end
+        doc
+      }
+      Results.new(raw_results)
     end
+
+    private
 
     def query_url_params(query)
       options = {
         :gen=>4,
-        :app_id=>configuration.app_id,
-        :app_code=>configuration.app_code
+        :app_id=>configuration[:app_id],
+        :app_code=>configuration[:app_code]
       }
 
-      if query.reverse_geocode?
+      if query.coordinates?
         super.merge(options).merge(
           :prox=>query.sanitized_text,
           :mode=>:retrieveAddresses
@@ -48,16 +45,5 @@ module Regis::Provider
       end
     end
 
-    # def api_key
-    #   if a=configuration.api_key
-    #     return a.first if a.is_a?(Array)
-    #   end
-    # end
-
-    # def api_code
-    #   if a=configuration.api_key
-    #     return a.last if a.is_a?(Array)
-    #   end
-    # end
   end
 end

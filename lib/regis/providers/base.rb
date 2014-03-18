@@ -1,113 +1,22 @@
-require 'net/http'
-require 'net/https'
-require 'uri'
-
-unless defined?(ActiveSupport::JSON)
-  begin
-    require 'rubygems' # for Ruby 1.8
-    require 'json'
-  rescue LoadError
-    raise LoadError, "Please install the 'json' or 'json_pure' gem to parse geocoder results."
-  end
-end
-
 module Regis
   module Provider
 
     class Base
 
-      ##
       # Human-readable name of the geocoding API.
-      #
       def name
-        fail
+        self.class.name.gsub(/^.*::(.*)$/, '\1').underscore
       end
 
-      ## # Symbol which is used in configuration to refer to this Lookup.
-      #
-      def handle
-        str = self.class.to_s
-        str[str.rindex(':')+1..-1].gsub(/([a-z\d]+)([A-Z])/,'\1_\2').downcase.to_sym
-      end
-
-      ##
-      # Query the geocoding API and return a Geocoder::Result object.
-      # Returns +nil+ on timeout or error.
-      #
-      # Takes a search string (eg: "Mississippi Coast Coliseumf, Biloxi, MS",
-      # "205.128.54.202") for geocoding, or coordinates (latitude, longitude)
-      # for reverse geocoding. Returns an array of <tt>Geocoder::Result</tt>s.
-      #
-      def search(query, options = {})
-        query = Regis::Query.new(query, options) unless query.is_a?(Regis::Query)
-        result = result_class.new([])
-
-        if(rate_limited)
-          result.cache_hit = @cache_hit if cache
-          result.rate_limited = @rate_limited if rate_limited
-        else
-          result_set = results(query)
-          case(result_set.count)
-          when 0
-            result.cache_hit = @cache_hit if cache
-            result.rate_limited = @rate_limited if rate_limited
-          else
-            result.cache_hit = @cache_hit if cache
-            result.rate_limited = @rate_limited if rate_limited
-            result_set.map{ |r|
-              if(configuration.normalize || options[:normalize])
-                result.data << result_helper_class.new(r).normalized_data
-              else
-                result.data << r
-              end
-            }
-          end
-          Regis::GeocodeLogEntry.create!(
-            query: query,
-            result: result,
-            provider: Regis::Configuration.provider.to_s)
-        end
-        # end
-        result
-      end
-
-      ##
-      # Return the URL for a map of the given coordinates.
-      #
-      # Not necessarily implemented by all subclasses as only some lookups
-      # also provide maps.
-      #
-      def map_link_url(coordinates)
-        nil
-      end
-
-      ##
       # Array containing string descriptions of keys required by the API.
       # Empty array if keys are optional or not required.
-      #
       def required_api_key_parts
         []
       end
 
-      ##
       # URL to use for querying the geocoding engine.
-      #
       def query_url(query)
-        fail
-      end
-
-      ##
-      # The working Cache object.
-      #
-      def cache
-        if @cache.nil? and store = configuration.cache
-          @cache = Cache.new(store, configuration.cache_prefix)
-        end
-        @cache
-      end
-
-      def rate_limited
-        @rate_limited
+        raise NotImplementedError
       end
 
       private # -------------------------------------------------------------
@@ -116,7 +25,7 @@ module Regis
       # An object with configuration data for this particular lookup.
       #
       def configuration
-        Regis.config_for_provider(handle)
+        Regis.config_for_provider(name)
       end
 
       ##
@@ -143,7 +52,7 @@ module Regis
       # Geocoder::Result object or nil on timeout or other error.
       #
       def results(query)
-        fail
+        raise NotImplementedError
       end
 
       def query_url_params(query)
@@ -157,50 +66,12 @@ module Regis
       end
 
       ##
-      # Key to use for caching a geocoding result. Usually this will be the
-      # request URL, but in cases where OAuth is used and the nonce,
-      # timestamp, etc varies from one request to another, we need to use
-      # something else (like the URL before OAuth encoding).
-      #
-      def cache_key(query)
-        query_url(query)
-      end
-
-      ##
-      # Class of the result objects
-      #
-      def result_class
-        Regis::Result.const_get(self.class.to_s.split(":").last)
-      end
-
-      def result_helper_class
-        Regis::ResultHelper.const_get(self.class.to_s.split(":").last)
-      end
-
-      ##
-      # Raise exception if configuration specifies it should be raised.
-      # Return false if exception not raised.
-      #
-      def raise_error(error, message = nil)
-        exceptions = configuration.always_raise
-        if exceptions == :all or exceptions.include?( error.is_a?(Class) ? error : error.class )
-          raise error, message
-        else
-          @rate_limited = true if (error.class == Regis::OverQueryLimitError)
-          false
-        end
-      end
-
-      ##
       # Returns a parsed search result (Ruby hash).
       #
       def fetch_data(query)
         parse_raw_data fetch_raw_data(query)
-      rescue SocketError => err
-        raise_error(err) or warn "Geocoding API connection cannot be established."
-      rescue TimeoutError => err
-        raise_error(err) or warn "Geocoding API not responding fast enough " +
-          "(use Regis.configure(:timeout => ...) to set limit)."
+      rescue SocketError => e
+        raise ConnectionError.new(e.message)
       end
 
       def parse_json(data)
@@ -216,8 +87,6 @@ module Regis
       #
       def parse_raw_data(raw_data)
         parse_json(raw_data)
-      rescue
-        warn "Geocoding API's response was not valid JSON."
       end
 
       ##
@@ -234,22 +103,11 @@ module Regis
 
       ##
       # Fetch a raw geocoding result (JSON string).
-      # The result might or might not be cached.
       #
       def fetch_raw_data(query)
-        key = cache_key(query)
-        if cache and body = cache[key]
-          @cache_hit = true
-        else
-          check_api_key_configuration!(query)
-          response = make_api_request(query)
-          body = response.body
-          if cache and valid_response?(response)
-            cache[key] = body
-          end
-          @cache_hit = false
-        end
-        body
+        check_api_key_configuration!(query)
+        response = make_api_request(query)
+        response.body
       end
 
       ##
@@ -257,7 +115,7 @@ module Regis
       # return the response object.
       #
       def make_api_request(query)
-        timeout(configuration.timeout) do
+        Timeout.timeout(configuration.timeout) do
           uri = URI.parse(query_url(query))
           args = [uri.host, uri.port]
           args = args.push(uri.user, uri.password) unless uri.user.nil? or uri.password.nil?
@@ -271,8 +129,8 @@ module Regis
       end
 
       def check_api_key_configuration!(query)
-        key_parts = query.provider.required_api_key_parts
-        if key_parts.size > Array(configuration.api_key).size
+        key_parts = required_api_key_parts
+        if key_parts.present? and key_parts.size > Array(configuration.api_key).size
           parts_string = key_parts.size == 1 ? key_parts.first : key_parts
           raise Regis::ConfigurationError,
             "The #{query.provider.name} API requires a key to be configured: " +
@@ -290,6 +148,7 @@ module Regis
           p[1].nil? ? nil : p.map{ |i| CGI.escape i.to_s } * '='
         }.compact.sort * '&'
       end
+
     end
   end
 end

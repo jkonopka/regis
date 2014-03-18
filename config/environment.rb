@@ -3,10 +3,24 @@ load(File.expand_path('../site.rb', __FILE__)) if File.exist?(File.expand_path('
 require "bundler"
 Bundler.require
 
+require 'timeout'
 require 'sinatra'
 require 'sinatra/reloader'
 require 'yaml'
 require 'active_record'
+require 'net/http'
+require 'net/https'
+require 'uri'
+require 'base64'
+
+unless defined?(ActiveSupport::JSON)
+  begin
+    require 'rubygems' # for Ruby 1.8
+    require 'json'
+  rescue LoadError
+    raise LoadError, "Please install the 'json' or 'json_pure' gem to parse geocoder results."
+  end
+end
 
 $LOAD_PATH.unshift(File.expand_path('../../api', __FILE__))
 $LOAD_PATH.unshift(File.expand_path('../../lib', __FILE__))

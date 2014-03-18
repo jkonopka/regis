@@ -1,18 +1,31 @@
 module Regis
+
   class Query
-    attr_accessor :text, :options
+
+    attr_reader :text, :options
 
     def initialize(text, options = {})
-      self.text = text
-      self.options = options
+      raise InvalidQueryError.new("Empty query") if text.blank?
+      @text = text
+      @options = options.dup.with_indifferent_access
     end
 
-    def execute
-      provider.search(text, options)
+    def eql?(other)
+      return other.is_a?(Query) &&
+        @text == other.text &&
+        @options == other.options
+    end
+    alias_method :==, :eql?
+
+    def inspect
+      "<Query text: #{@text.inspect} options: #{@options.inspect}>"
     end
 
-    def to_s
-      text
+    def as_json(*args)
+      return {
+        text: @text,
+        options: @options
+      }
     end
 
     def sanitized_text
@@ -27,81 +40,34 @@ module Regis
       end
     end
 
-    ##
-    # Get a provider object (which communicates with the remote geocoding API)
-    # appropriate to the Query text.
-    #
-    def provider
-      if ip_address?
-        name = options[:ip_provider] || Configuration.ip_provider || Regis::Provider.ip_services.first
-      else
-        name = options[:provider] || Configuration.provider || Regis::Provider.street_services.first
-      end
-      Provider.get(name.to_sym)
-    end
-
     def url
-      provider.query_url(self)
+      @provider.query_url(self)
     end
 
-    ##
-    # Is the Query blank? (ie, should we not bother searching?)
-    # A query is considered blank if its text is nil or empty string AND
-    # no URL parameters are specified.
-    #
-    def blank?
-      !params_given? and (
-        (text.is_a?(Array) and text.compact.size < 2) or
-        text.to_s.match(/\A\s*\z/)
-      )
-    end
-
-    ##
-    # Does the Query text look like an IP address?
-    #
-    # Does not check for actual validity, just the appearance of four
-    # dot-delimited numbers.
-    #
-    def ip_address?
-      IpAddress.new(text).valid? rescue false
-    end
-
-    ##
-    # Is the Query text a loopback IP address?
-    #
-    def loopback_ip_address?
-      ip_address? && IpAddress.new(text).loopback?
-    end
-
-    ##
     # Does the given string look like latitude/longitude coordinates?
-    #
     def coordinates?
-      text.is_a?(Array) or (
-        text.is_a?(String) and
-        !!text.to_s.match(/\A-?[0-9\.]+, *-?[0-9\.]+\z/)
-      )
+      case @text
+        when Array
+          @text.length == 2 && @text.all? { |v| v.is_a?(Float) }
+        when String
+          !!text.to_s.strip.match(/\A-?[0-9\.]+, *-?[0-9\.]+\z/)
+        else
+          false
+      end
     end
 
-    ##
     # Return the latitude/longitude coordinates specified in the query,
     # or nil if none.
-    #
     def coordinates
-      sanitized_text.split(',') if coordinates?
+      sanitized_text.split(',').map(&:to_f) if coordinates?
     end
 
-    ##
-    # Should reverse geocoding be performed for this query?
-    #
-    def reverse_geocode?
-      coordinates?
-    end
+    private
 
-    private # ----------------------------------------------------------------
+      def params_given?
+        !!(options[:params].is_a?(Hash) and options[:params].keys.size > 0)
+      end
 
-    def params_given?
-      !!(options[:params].is_a?(Hash) and options[:params].keys.size > 0)
-    end
   end
+
 end

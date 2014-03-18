@@ -17,6 +17,9 @@ require 'webmock/rspec'
 require 'stringio'
 require 'pp'
 
+require_relative './support/test_provider'
+require_relative './support/shared_examples'
+
 set :environment, :test
 
 LOGGER.level = Logger::FATAL
@@ -25,14 +28,12 @@ RSpec.configure do |config|
   config.before :each do
     WebMock.reset!
   end
-  config.around :each do |block|
-    abort_class = Class.new(Exception) {}
-    begin
-      ActiveRecord::Base.transaction do
-        block.call
-        raise abort_class
-      end
-    rescue abort_class
+  config.around :each do |example|
+    clear_cookies if respond_to?(:clear_cookies)
+    ActiveRecord::Base.connection.transaction do
+      example.run
+      raise ActiveRecord::Rollback
     end
   end
+  config.alias_it_should_behave_like_to :it_implements, 'implements:'
 end

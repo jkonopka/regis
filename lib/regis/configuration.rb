@@ -14,10 +14,12 @@ module Regis
   end
 
   def self.config_for_provider(provider_name)
+    provider_name = provider_name.to_sym
     data = config.clone
-    data.reject!{ |key,value| !Configuration::OPTIONS.include?(key) }
+    data.reject!{ |key,value| !Configuration::OPTIONS.include?(key.to_sym) }
     if config.has_key?(provider_name)
       data.merge!(config[provider_name])
+      data.delete(provider_name)
     end
     data
   end
@@ -34,14 +36,11 @@ module Regis
       :http_proxy,
       :https_proxy,
       :api_key,
-      :cache,
-      :cache_prefix,
-      :always_raise,
-      :units,
-      :distances,
       :app_id,
       :app_code,
-      :normalize
+      :units,
+      :distances,
+      :here
     ]
 
     attr_accessor :data
@@ -80,16 +79,8 @@ def set_defaults
       @data[:http_proxy]   = nil         # HTTP proxy server (user:pass@host:port)
       @data[:https_proxy]  = nil         # HTTPS proxy server (user:pass@host:port)
       @data[:api_key]      = nil         # API key for geocoding service
-      @data[:cache]        = nil         # cache object (must respond to #[], #[]=, and #keys)
-      @data[:cache_prefix] = "regis:" # prefix (string) to use for all cache keys
-      @data[:cache]        = nil         # cache object (must respond to #[], #[]=, and #keys)
-      @data[:app_id]        = "6BfYFgVfbRGLufNa3YyH"         # here app_id
-      @data[:app_code]      = "dT4mkeydz7V0oVQ01PDHQQ"         # here app_code
-      @data[:normalize]     = true
-      # exceptions that should not be rescued by default
-      # (if you want to implement custom error handling);
-      # supports SocketError and TimeoutError
-      @data[:always_raise] = []
+      @data[:app_id]        = nil         # here app_id
+      @data[:app_code]      = nil         # here app_code
 
       # calculation options
       @data[:units]     = :mi      # :mi or :km

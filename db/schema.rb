@@ -10,21 +10,29 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140213180445) do
+ActiveRecord::Schema.define(version: 20140317203932) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "cached_results", force: true do |t|
+    t.datetime "created_at"
+    t.text     "provider"
+    t.text     "query"
+    t.text     "result"
+    t.text     "key"
+  end
+
+  add_index "cached_results", ["key"], name: "index_cached_results_on_key", using: :btree
 
   create_table "geocode_log_entries", force: true do |t|
     t.text     "query"
     t.text     "result"
     t.string   "provider"
     t.datetime "created_at"
-    t.datetime "updated_at"
   end
 
   add_index "geocode_log_entries", ["created_at"], name: "index_geocode_log_entries_on_created_at", using: :btree
   add_index "geocode_log_entries", ["provider"], name: "index_geocode_log_entries_on_provider", using: :btree
-  add_index "geocode_log_entries", ["updated_at"], name: "index_geocode_log_entries_on_updated_at", using: :btree
 
 end
