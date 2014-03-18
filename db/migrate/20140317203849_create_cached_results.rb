@@ -3,6 +3,7 @@ class CreateCachedResults < ActiveRecord::Migration
   def up
     create_table :cached_results do |t|
       t.timestamp :created_at
+      t.text :provider
       t.text :query
       t.text :result
       t.text :key
