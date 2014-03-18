@@ -4,12 +4,10 @@ module Regis
 
   class V1 < Sinatra::Base
 
-    configure do
-      enable :logging
-      set :show_exceptions, false
-      set :root, File.expand_path('..', __FILE__)
-    end
-
+    enable :logging
+    set :show_exceptions, false
+    set :protection, :except => :http_origin
+    set :root, File.expand_path('..', __FILE__)
     use Rack::ConditionalGet
     use Rack::PostBodyContentTypeParser
     use Rack::MethodOverride
