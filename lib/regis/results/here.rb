@@ -1,3 +1,5 @@
+require_relative '../providers/here'
+
 class Regis::Provider::Here
 
   class Results

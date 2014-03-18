@@ -1,3 +1,5 @@
+require_relative './base'
+
 module Regis::Provider
 
   class Ovi < Base
